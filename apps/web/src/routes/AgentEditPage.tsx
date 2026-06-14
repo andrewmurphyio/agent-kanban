@@ -81,7 +81,7 @@ export function AgentEditPage() {
           soul: soul.trim() || undefined,
           role: role.trim() || undefined,
           runtime,
-          model: model.trim() || undefined,
+          model: model.trim() || null,
           skills: skills.length ? skills : undefined,
         },
       });

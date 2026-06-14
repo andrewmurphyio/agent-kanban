@@ -3,6 +3,12 @@ import { join } from "node:path";
 import type { CreateAgentInput, CreateSubagentInput } from "@agent-kanban/shared";
 import { Miniflare } from "miniflare";
 
+type D1Database = any;
+type AnalyticsEngineDataset = any;
+type SendEmail = any;
+type DurableObjectNamespace = any;
+type Fetcher = any;
+
 const MIGRATIONS_DIR = join(__dirname, "../../apps/web/migrations");
 
 export function createTestEnv() {
@@ -10,11 +16,15 @@ export function createTestEnv() {
     DB: null as any as D1Database,
     AE: { writeDataPoint: () => {} } as unknown as AnalyticsEngineDataset,
     EMAIL: { send: async () => ({ messageId: "test-message" }) } as SendEmail,
+    TUNNEL_RELAY: {} as DurableObjectNamespace,
+    ASSETS: { fetch: async () => new Response("test asset", { status: 404 }) } as Fetcher,
     AUTH_SECRET: "test-secret-32-chars-minimum-ok!!",
     ALLOWED_HOSTS: "localhost:8788",
     GITHUB_CLIENT_ID: "x",
     GITHUB_CLIENT_SECRET: "x",
     MAILS_ADMIN_TOKEN: "",
+    CF_ACCOUNT_ID: "test-account",
+    CF_API_TOKEN: "test-token",
   };
 }
 

@@ -664,6 +664,22 @@ describe("routes", () => {
     expect(body).not.toHaveProperty("mailbox_token");
   });
 
+  it("PATCH /api/agents/:id clears model when set to null", async () => {
+    const jwt = await signLeaderSessionJWT();
+    const agent = await createTestAgent(env.DB, userId, {
+      name: "Patch Clear Model Agent",
+      username: "patch-clear-model-agent",
+      runtime: "pi",
+      model: "gpt-5.4",
+    });
+
+    const res = await apiRequest("PATCH", `/api/agents/${agent.id}`, { model: null }, jwt);
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as any;
+    expect(body.model).toBeNull();
+  });
+
   it("PATCH /api/agents/:id rejects non-kebab-case role", async () => {
     const jwt = await signLeaderSessionJWT();
     const res = await apiRequest("PATCH", `/api/agents/${agentId}`, { role: "Release Manager" }, jwt);
