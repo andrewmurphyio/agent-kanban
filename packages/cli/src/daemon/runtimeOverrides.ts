@@ -1,6 +1,6 @@
 import { type AgentRuntime, normalizeRuntime } from "@agent-kanban/shared";
 
-const KNOWN_RUNTIMES = new Set<AgentRuntime>(["claude", "codex", "gemini", "copilot", "hermes"]);
+const KNOWN_RUNTIMES = new Set<AgentRuntime>(["claude", "codex", "gemini", "copilot", "hermes", "pi"]);
 
 export function isRuntimeLimitIgnored(runtime: string): boolean {
   const normalized = normalizeRuntime(runtime);

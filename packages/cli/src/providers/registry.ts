@@ -5,6 +5,7 @@ import { claudeProvider } from "./claude.js";
 import { codexProvider } from "./codex.js";
 import { copilotProvider } from "./copilot.js";
 import { geminiProvider } from "./gemini.js";
+import { piProvider } from "./pi.js";
 import type { AgentProvider } from "./types.js";
 
 export { normalizeRuntime };
@@ -24,6 +25,7 @@ const RUNTIME_COMMANDS: Record<AgentRuntime, string> = {
   gemini: "gemini",
   copilot: "copilot",
   hermes: "hermes",
+  pi: "pi",
 };
 
 export function registerProvider(provider: AgentProvider): void {
@@ -55,6 +57,7 @@ registerProvider(claudeProvider);
 registerProvider(geminiProvider);
 registerProvider(codexProvider);
 registerProvider(copilotProvider);
+registerProvider(piProvider);
 for (const cfg of ACP_RUNTIMES) {
   registerProvider(createAcpProvider(cfg));
 }

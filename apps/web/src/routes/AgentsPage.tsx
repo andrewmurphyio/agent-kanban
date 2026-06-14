@@ -15,6 +15,7 @@ const runtimeMeta: Record<AgentRuntime, { icon: LucideIcon; tone: string }> = {
   gemini: { icon: Sparkles, tone: "text-warning" },
   copilot: { icon: Github, tone: "text-success" },
   hermes: { icon: Code2, tone: "text-content-tertiary" },
+  pi: { icon: Code2, tone: "text-accent" },
 };
 
 function formatTokens(n: number): string {

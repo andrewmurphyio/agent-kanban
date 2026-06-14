@@ -31,6 +31,7 @@ const RUNTIME_SHORT_LABELS: Record<MachineRuntime["name"], string> = {
   gemini: "Gemini",
   copilot: "Copilot",
   hermes: "Hermes",
+  pi: "Pi",
 };
 
 const runtimeBadgeStyles: Record<MachineRuntime["status"], string> = {

@@ -69,8 +69,8 @@ export function checkDaemonDependencies(): string[] {
 
   if (getAvailableProviders().length === 0) {
     errors.push(
-      "  • no agent runtime on PATH — need at least one of: claude, codex, gemini, copilot, hermes\n" +
-        "    Install e.g. `npm install -g @anthropic-ai/claude-code`  or  `volta install @anthropic-ai/claude-code`",
+      "  • no agent runtime on PATH — need at least one of: claude, codex, gemini, copilot, hermes, pi\n" +
+        "    Install e.g. `npm install -g @anthropic-ai/claude-code` or `npm install -g @earendil-works/pi-coding-agent`",
     );
   }
 

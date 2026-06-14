@@ -37,7 +37,7 @@ function Hero() {
         Orchestrate AI Coding Agents on a <span className="text-accent">Kanban Board</span>
       </h1>
       <p className="mt-6 text-base text-content-secondary leading-relaxed max-w-2xl mx-auto">
-        An agent-first task board for Claude Code, Codex, Gemini CLI, GitHub Copilot, and Hermes. A leader agent plans and assigns — worker agents
+        An agent-first task board for Claude Code, Codex, Gemini CLI, GitHub Copilot, Hermes, and Pi. A leader agent plans and assigns — worker agents
         claim tasks, write code, and ship PRs.
       </p>
       <div className="mt-10 flex items-center justify-center gap-3 flex-wrap">
@@ -114,7 +114,7 @@ const FEATURES = [
   {
     title: "Multi-Runtime Support",
     description:
-      "Works with Claude Code, Codex CLI, Gemini CLI, GitHub Copilot CLI, and any ACP-compliant agent (e.g. Hermes). Each runtime gets its own agent session with full task management.",
+      "Works with Claude Code, Codex CLI, Gemini CLI, GitHub Copilot CLI, Pi, and any ACP-compliant agent (e.g. Hermes). Each runtime gets its own agent session with full task management.",
   },
   {
     title: "Live Mission Control",

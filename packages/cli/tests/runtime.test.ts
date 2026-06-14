@@ -35,6 +35,7 @@ function clearRuntimeEnv() {
   delete process.env.COPILOT_CLI;
   delete process.env.HERMES_INTERACTIVE;
   delete process.env.HERMES_SESSION_KEY;
+  delete process.env.PI_CODING_AGENT;
 }
 
 beforeEach(() => {
@@ -81,6 +82,11 @@ describe("detectRuntime", () => {
   it("returns 'hermes' when HERMES_SESSION_KEY is set", () => {
     process.env.HERMES_SESSION_KEY = "agent:main:telegram:dm:527035525";
     expect(detectRuntime()).toBe("hermes");
+  });
+
+  it("returns 'pi' when PI_CODING_AGENT is set", () => {
+    process.env.PI_CODING_AGENT = "1";
+    expect(detectRuntime()).toBe("pi");
   });
 
   it("prioritises CLAUDECODE over CODEX_CI when both are set", () => {
@@ -168,6 +174,11 @@ describe("findRuntimeAncestorPid — happy paths", () => {
   it("matches Hermes gateway process command", () => {
     mockExecFileSync.mockReturnValueOnce(psLine(1, "/Users/saltbo/.hermes/hermes-agent/venv/bin/python -m hermes_cli.main gateway run --replace"));
     expect(findRuntimeAncestorPid("hermes")).toBe(process.ppid);
+  });
+
+  it("matches 'pi' runtime against pi command", () => {
+    mockExecFileSync.mockReturnValueOnce(psLine(1, "/usr/local/bin/pi"));
+    expect(findRuntimeAncestorPid("pi")).toBe(process.ppid);
   });
 
   it("does not match a command where runtime name is a substring of another word", () => {

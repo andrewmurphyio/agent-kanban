@@ -16,6 +16,7 @@ vi.mock("node:child_process", () => ({
   execSync: vi.fn().mockImplementation(() => {
     throw new Error("missing");
   }),
+  spawn: vi.fn(),
 }));
 
 // Mock logger to suppress output
@@ -71,6 +72,7 @@ import {
   geminiProvider,
   resolveGeminiCommand,
 } from "../src/providers/gemini.js";
+import { buildPiArgs, mapPiEvent, parsePiModelList, piProvider } from "../src/providers/pi.js";
 import { getAvailableProviders, getProvider, registerProvider } from "../src/providers/registry.js";
 import type { AgentProvider } from "../src/providers/types.js";
 
@@ -1024,6 +1026,106 @@ describe("registry.getAvailableProviders", () => {
     registerProvider(ghost);
     const available = getAvailableProviders();
     expect(available.find((p) => p.name === "ghost-cmd-provider")).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// piProvider model parsing / args / event mapping
+// ---------------------------------------------------------------------------
+
+describe("piProvider identity", () => {
+  it("name is pi", () => {
+    expect(piProvider.name).toBe("pi");
+  });
+
+  it("label is Pi", () => {
+    expect(piProvider.label).toBe("Pi");
+  });
+});
+
+describe("parsePiModelList", () => {
+  it("parses pi --list-models table output", () => {
+    const models = parsePiModelList(
+      `provider        model                   context  max-out  thinking  images\nopenai-codex    gpt-5.4                 272K     128K     yes       yes\ngithub-copilot  claude-sonnet-4.6       1M       32K      yes       yes\n`,
+    );
+
+    expect(models).toEqual([
+      {
+        id: "openai-codex/gpt-5.4",
+        name: "gpt-5.4",
+        description: "openai-codex",
+        context_window: 272000,
+        output_token_limit: 128000,
+        supports: { images: true, thinking: true },
+      },
+      {
+        id: "github-copilot/claude-sonnet-4.6",
+        name: "claude-sonnet-4.6",
+        description: "github-copilot",
+        context_window: 1000000,
+        output_token_limit: 32000,
+        supports: { images: true, thinking: true },
+      },
+    ]);
+  });
+});
+
+describe("buildPiArgs", () => {
+  it("starts pi in RPC mode with Agent Kanban's default tools", () => {
+    const args = buildPiArgs({ sessionId: "s1", cwd: "/", env: {}, taskContext: "do it" });
+    expect(args).toContain("--mode");
+    expect(args).toContain("rpc");
+    expect(args).toContain("--approve");
+    expect(args).toContain("--no-extensions");
+    expect(args).toContain("read,bash,edit,write,grep,find,ls");
+  });
+
+  it("uses --session when resuming", () => {
+    const args = buildPiArgs({ sessionId: "s1", cwd: "/", env: {}, taskContext: "fix", resume: true, resumeToken: "/tmp/session.jsonl" });
+    expect(args).toContain("--session");
+    expect(args).toContain("/tmp/session.jsonl");
+  });
+});
+
+describe("mapPiEvent", () => {
+  it("maps text_end deltas to block.done text events", () => {
+    const state = { cumulativeCost: 0, resultSeen: false, pendingTools: new Map() };
+    const events = mapPiEvent({ type: "message_update", assistantMessageEvent: { type: "text_end", content: "done" } }, state);
+    expect(events).toEqual([{ type: "block.done", block: { type: "text", text: "done" } }]);
+  });
+
+  it("maps tool execution start and end to tool blocks", () => {
+    const state = { cumulativeCost: 0, resultSeen: false, pendingTools: new Map() };
+    const start = mapPiEvent({ type: "tool_execution_start", toolCallId: "t1", toolName: "bash", args: { command: "pwd" } }, state);
+    const end = mapPiEvent(
+      { type: "tool_execution_end", toolCallId: "t1", result: { content: [{ type: "text", text: "/tmp" }] }, isError: false },
+      state,
+    );
+
+    expect(start).toEqual([{ type: "block.start", block: { type: "tool_use", id: "t1", name: "Bash", input: { command: "pwd" } } }]);
+    expect(end).toEqual([
+      { type: "block.done", block: { type: "tool_use", id: "t1", name: "Bash", input: { command: "pwd" } } },
+      { type: "block.done", block: { type: "tool_result", tool_use_id: "t1", output: "/tmp", error: undefined } },
+    ]);
+  });
+
+  it("maps turn_end usage to Agent Kanban token fields", () => {
+    const state = { cumulativeCost: 0, resultSeen: false, pendingTools: new Map() };
+    const events = mapPiEvent(
+      {
+        type: "turn_end",
+        message: { usage: { input: 10, output: 20, cacheRead: 3, cacheWrite: 4, cost: { total: 0.02 } } },
+      },
+      state,
+    );
+
+    expect(events).toEqual([
+      {
+        type: "turn.end",
+        cost: 0.02,
+        usage: { input_tokens: 10, output_tokens: 20, cache_read_input_tokens: 3, cache_creation_input_tokens: 4 },
+      },
+    ]);
   });
 });
 

@@ -151,7 +151,7 @@ export interface MachineWithAgents extends Machine {
 
 export type AgentStatus = "online" | "offline";
 export type AgentKind = "worker" | "leader";
-export type AgentRuntime = "claude" | "codex" | "gemini" | "copilot" | "hermes";
+export type AgentRuntime = "claude" | "codex" | "gemini" | "copilot" | "hermes" | "pi";
 
 const USERNAME_RE = /^[a-z0-9][a-z0-9-]{0,38}[a-z0-9]$|^[a-z0-9]$/;
 const AGENT_ROLE_RE = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
@@ -183,7 +183,7 @@ export function findInvalidSkillRef(skills: string[] | null | undefined): string
   return skills?.find((skill) => !isValidSkillRef(skill)) ?? null;
 }
 
-export const AGENT_RUNTIMES: readonly AgentRuntime[] = ["claude", "codex", "gemini", "copilot", "hermes"] as const;
+export const AGENT_RUNTIMES: readonly AgentRuntime[] = ["claude", "codex", "gemini", "copilot", "hermes", "pi"] as const;
 
 export const RUNTIME_LABELS: Record<AgentRuntime, string> = {
   claude: "Claude Code",
@@ -191,6 +191,7 @@ export const RUNTIME_LABELS: Record<AgentRuntime, string> = {
   gemini: "Gemini CLI",
   copilot: "GitHub Copilot",
   hermes: "Hermes",
+  pi: "Pi",
 };
 
 const RUNTIME_ALIASES: Record<string, AgentRuntime> = {
@@ -199,6 +200,7 @@ const RUNTIME_ALIASES: Record<string, AgentRuntime> = {
   "github-copilot": "copilot",
   "copilot-cli": "copilot",
   "hermes-agent": "hermes",
+  "pi-coding-agent": "pi",
 };
 
 export function normalizeRuntime(runtime: string): AgentRuntime {

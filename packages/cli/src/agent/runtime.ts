@@ -15,11 +15,15 @@ const RUNTIMES: Record<string, RuntimeSpec> = {
     envVars: ["HERMES_INTERACTIVE", "HERMES_SESSION_KEY"],
     commandPattern: /(^|\/)hermes(\s|$)|(^|\s)hermes_cli\.main(\s|$)/,
   },
+  pi: { envVars: ["PI_CODING_AGENT"], commandPattern: /(^|\/)pi(\s|$)/ },
 };
 
 export function detectRuntime(): string | null {
   for (const [name, { envVars }] of Object.entries(RUNTIMES)) {
     if (envVars.some((envVar) => process.env[envVar])) return name;
+  }
+  for (const name of Object.keys(RUNTIMES)) {
+    if (findRuntimeAncestorPid(name)) return name;
   }
   return null;
 }

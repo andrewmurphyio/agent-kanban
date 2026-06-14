@@ -158,7 +158,7 @@ describe("checkDaemonDependencies()", () => {
     expect(errors[0]).toContain("no agent runtime on PATH");
   });
 
-  it("lists all five runtime names in the no-runtime error block", () => {
+  it("lists all runtime names in the no-runtime error block", () => {
     mockGetAvailableProviders.mockReturnValue([]);
 
     const errors = checkDaemonDependencies();
@@ -169,6 +169,7 @@ describe("checkDaemonDependencies()", () => {
     expect(block).toContain("gemini");
     expect(block).toContain("copilot");
     expect(block).toContain("hermes");
+    expect(block).toContain("pi");
   });
 
   it("returns errors for both missing binaries and missing runtime together", () => {
